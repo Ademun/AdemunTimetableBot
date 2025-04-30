@@ -3,7 +3,7 @@ package org.ademun.timetablebot.callback;
 import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
 import org.ademun.timetablebot.dto.GroupDto;
-import org.ademun.timetablebot.service.ChatStateService;
+import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,32 +15,26 @@ import java.util.regex.Pattern;
 
 @Component
 public class SetupChatFirstStepCallback implements Callback {
-  private final ChatStateService chatStateService;
+  private final ChatContextService chatContextService;
   private final GroupService groupService;
 
   @Autowired
-  public SetupChatFirstStepCallback(ChatStateService chatStateService, GroupService groupService) {
-    this.chatStateService = chatStateService;
+  public SetupChatFirstStepCallback(ChatContextService chatContextService, GroupService groupService) {
+    this.chatContextService = chatContextService;
     this.groupService = groupService;
   }
 
   @Override
   public @NonNull SendMessage execute(Update update) {
     Long chatId = update.getMessage().getChatId();
-    if (chatStateService.getChatState(chatId).isEmpty()) {
-      chatStateService.getChatState(chatId)
-          .ifPresent(chatState -> chatState.setChatState(ChatContext.State.IDLE));
-      return SendMessage.builder().chatId(chatId)
-          .text("Кажется вы ещё не создали группу в этом чате. Используйте команду /start").build();
-    }
+    ChatContext context = chatContextService.getChatContext(chatId).orElseThrow();
     String groupName = update.getMessage().getText();
     if (!validateGroupName(groupName)) {
       return SendMessage.builder().chatId(chatId)
           .text("Введите код группы в корректном формате (Например ИН-24-8)").build();
     }
+    context.setChatState(ChatContext.State.IDLE);
     GroupDto groupDto = new GroupDto(groupName, chatId);
-    chatStateService.getChatState(chatId)
-        .ifPresent(chatState -> chatState.setChatState(ChatContext.State.IDLE));
     GroupDto response = groupService.createGroup(groupDto);
     System.out.println(response);
     return SendMessage.builder().chatId(chatId).text("Группа " + groupName + " создана!").build();

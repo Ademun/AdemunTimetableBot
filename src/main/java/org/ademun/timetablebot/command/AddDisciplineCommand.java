@@ -4,7 +4,7 @@ import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
 import org.ademun.timetablebot.dto.DisciplineDto;
 import org.ademun.timetablebot.dto.GroupDto;
-import org.ademun.timetablebot.service.ChatStateService;
+import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.DisciplineService;
 import org.ademun.timetablebot.service.GroupService;
 import org.jetbrains.annotations.NotNull;
@@ -23,28 +23,27 @@ import java.util.Locale;
 
 @Component
 public class AddDisciplineCommand implements Command {
-  private final ChatStateService chatStateService;
-  private final GroupService groupService;
+  private final ChatContextService chatContextService;
   private final DisciplineService disciplineService;
 
   @Autowired
-  public AddDisciplineCommand(ChatStateService chatStateService, GroupService groupService,
+  public AddDisciplineCommand(ChatContextService chatContextService,
       DisciplineService disciplineService) {
-    this.chatStateService = chatStateService;
-    this.groupService = groupService;
+    this.chatContextService = chatContextService;
     this.disciplineService = disciplineService;
   }
 
   @Override
   public @NonNull SendMessage execute(Update update) {
     Long chatId = update.getMessage().getChatId();
-    if (chatStateService.getChatState(chatId).isEmpty()) {
+    ChatContext context = chatContextService.getChatContext(chatId).orElse(null);
+
+    if (context == null) {
       return SendMessage.builder().chatId(chatId)
           .text("Кажется вы ещё не создали группу в этом чате. Используйте команду /start").build();
     }
-    chatStateService.getChatState(chatId)
-        .ifPresent(chatState -> chatState.setChatState(ChatContext.State.GROUP_ADD_DISCIPLINE));
-    GroupDto groupDto = groupService.getGroupByChannelId(chatId);
+    context.setChatState(ChatContext.State.GROUP_ADD_DISCIPLINE);
+
     List<DisciplineDto> disciplines = disciplineService.getAllDisciplines();
     return SendMessage.builder().chatId(chatId)
         .text("Добавьте новую дисциплину или выберите существующую")

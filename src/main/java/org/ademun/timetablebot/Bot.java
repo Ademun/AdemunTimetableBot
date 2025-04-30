@@ -4,7 +4,7 @@ import org.ademun.timetablebot.command.Command;
 import org.ademun.timetablebot.config.BotConfig;
 import org.ademun.timetablebot.context.ChatContext;
 import org.ademun.timetablebot.service.CallbackService;
-import org.ademun.timetablebot.service.ChatStateService;
+import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.CommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,16 +25,16 @@ import java.util.List;
 public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
   private final BotConfig config;
   private final TelegramClient telegramClient;
-  private final ChatStateService chatStateService;
+  private final ChatContextService chatContextService;
   private final CommandService commandService;
   private final CallbackService callbackService;
 
   @Autowired
-  public Bot(BotConfig config, ChatStateService chatStateService, CommandService commandService,
+  public Bot(BotConfig config, ChatContextService chatContextService, CommandService commandService,
       CallbackService callbackService) {
     this.config = config;
     this.telegramClient = new OkHttpTelegramClient(config.getToken());
-    this.chatStateService = chatStateService;
+    this.chatContextService = chatContextService;
     this.commandService = commandService;
     this.callbackService = callbackService;
     setupCommands();
@@ -63,7 +63,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
         } catch (TelegramApiException e) {
           throw new RuntimeException(e);
         }
-      } else if (chatStateService.getChatState(update.getMessage().getChatId()).orElseThrow()
+      } else if (chatContextService.getChatContext(update.getMessage().getChatId()).orElseThrow()
           .getChatState() != ChatContext.State.IDLE) {
         try {
           telegramClient.execute(callbackService.handle(update));

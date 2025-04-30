@@ -2,7 +2,7 @@ package org.ademun.timetablebot.command;
 
 import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
-import org.ademun.timetablebot.service.ChatStateService;
+import org.ademun.timetablebot.service.ChatContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,17 +10,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 public class SetupCommand implements Command {
-  private final ChatStateService chatStateService;
+  private final ChatContextService chatContextService;
 
   @Autowired
-  public SetupCommand(ChatStateService chatStateService) {
-    this.chatStateService = chatStateService;
+  public SetupCommand(ChatContextService chatContextService) {
+    this.chatContextService = chatContextService;
   }
 
   @Override
   public @NonNull SendMessage execute(Update update) {
     Long chatId = update.getMessage().getChatId();
-    if (chatStateService.getChatState(chatId).isPresent()) {
+    ChatContext context = chatContextService.getChatContext(chatId).orElse(null);
+    if (context != null) {
       return SendMessage.builder().chatId(chatId).text("Вы уже создали группу в этом чате").build();
     }
     createContext(chatId);
@@ -31,7 +32,7 @@ public class SetupCommand implements Command {
   private void createContext(Long chatId) {
     ChatContext context = new ChatContext();
     context.setChatState(ChatContext.State.CHAT_SETUP);
-    chatStateService.putChatState(chatId, context);
+    chatContextService.putChatContext(chatId, context);
   }
 
   @Override

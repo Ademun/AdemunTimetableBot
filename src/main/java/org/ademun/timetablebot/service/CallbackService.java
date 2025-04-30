@@ -12,17 +12,17 @@ import java.util.List;
 @Service
 public class CallbackService {
   private final List<Callback> callbacks;
-  private final ChatStateService chatStateService;
+  private final ChatContextService chatContextService;
 
   @Autowired
-  public CallbackService(List<Callback> callbacks, ChatStateService chatStateService) {
+  public CallbackService(List<Callback> callbacks, ChatContextService chatContextService) {
     this.callbacks = callbacks;
-    this.chatStateService = chatStateService;
+    this.chatContextService = chatContextService;
   }
 
   public SendMessage handle(Update update) {
     ChatContext.State state =
-        chatStateService.getChatState(update.getMessage().getChatId()).orElseThrow().getChatState();
+        chatContextService.getChatContext(update.getMessage().getChatId()).orElseThrow().getChatState();
     Callback callback =
         callbacks.stream().filter(clbck -> clbck.getAccordingContext() == state).findFirst()
             .orElse(null);

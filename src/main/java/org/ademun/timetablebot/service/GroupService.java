@@ -17,7 +17,7 @@ import java.util.Optional;
 @Service
 public class GroupService {
   private final RestClient client = RestClient.builder()
-                                              .baseUrl("https://localhost:8080/api/groups")
+                                              .baseUrl("http://localhost:8080/api/groups/")
                                               .requestInterceptor(((request, body, execution) -> {
                                                 log.info("Request sent on {}", request.getURI());
                                                 return execution.execute(request, body);
@@ -55,13 +55,12 @@ public class GroupService {
                  .findFirst();
   }
 
-  public GroupDto createGroup(GroupDto groupDto) {
-    return client.post()
-                 .contentType(MediaType.APPLICATION_JSON)
-                 .body(groupDto)
-                 .retrieve()
-                 .toEntity(GroupDto.class)
-                 .getBody();
+  public void createGroup(GroupDto groupDto) {
+    client.post()
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(groupDto)
+          .retrieve()
+          .toBodilessEntity();
   }
 
   public void deleteGroupById(Long id) {
@@ -80,7 +79,17 @@ public class GroupService {
   public void addDiscipline(Long id, DisciplineDto disciplineDto) {
     client.post()
           .uri("{id}/disciplines/", id)
-          .body(disciplineDto);
+          .body(disciplineDto)
+          .retrieve()
+          .toBodilessEntity();
+  }
+
+  public void removeDiscipline(Long id, Long disciplineId) {
+    System.out.println(disciplineId);
+    client.delete()
+          .uri("{id}/disciplines/{disciplineId}", id, disciplineId)
+          .retrieve()
+          .toBodilessEntity();
   }
 
   public List<ProfessorDto> getProfessors(Long id) {

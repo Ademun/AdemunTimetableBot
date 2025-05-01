@@ -3,9 +3,11 @@ package org.ademun.timetablebot;
 import org.ademun.timetablebot.command.Command;
 import org.ademun.timetablebot.config.BotConfig;
 import org.ademun.timetablebot.context.ChatContext;
+import org.ademun.timetablebot.dto.GroupDto;
 import org.ademun.timetablebot.service.CallbackService;
 import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.CommandService;
+import org.ademun.timetablebot.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -29,16 +31,19 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
   private final ChatContextService chatContextService;
   private final CommandService commandService;
   private final CallbackService callbackService;
+  private final GroupService groupService;
 
   @Autowired
   public Bot(BotConfig config, ChatContextService chatContextService, CommandService commandService,
-      CallbackService callbackService) {
+      CallbackService callbackService, GroupService groupService) {
     this.config = config;
     this.telegramClient = new OkHttpTelegramClient(config.getToken());
     this.chatContextService = chatContextService;
     this.commandService = commandService;
     this.callbackService = callbackService;
+    this.groupService = groupService;
     setupCommands();
+    retrieveGroups();
     System.out.println("Bot: " + config.getName() + " has started");
   }
 
@@ -87,6 +92,13 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
       telegramClient.execute(callbackService.handle(update));
     } catch (TelegramApiException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private void retrieveGroups() {
+    List<GroupDto> groups = groupService.getAllGroups();
+    for (GroupDto group : groups) {
+      chatContextService.putChatContext(group.getChannelId(), new ChatContext());
     }
   }
 

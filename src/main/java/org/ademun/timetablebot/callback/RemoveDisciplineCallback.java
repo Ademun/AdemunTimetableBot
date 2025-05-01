@@ -2,29 +2,23 @@ package org.ademun.timetablebot.callback;
 
 import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
-import org.ademun.timetablebot.dto.DisciplineDto;
 import org.ademun.timetablebot.service.ChatContextService;
-import org.ademun.timetablebot.service.DisciplineService;
 import org.ademun.timetablebot.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.List;
-
 @Component
-public class AddDisciplineCallback implements Callback {
+public class RemoveDisciplineCallback implements Callback {
   private final ChatContextService chatContextService;
   private final GroupService groupService;
-  private final DisciplineService disciplineService;
 
   @Autowired
-  public AddDisciplineCallback(ChatContextService chatContextService, GroupService groupService,
-      DisciplineService disciplineService) {
+  public RemoveDisciplineCallback(ChatContextService chatContextService,
+      GroupService groupService) {
     this.chatContextService = chatContextService;
     this.groupService = groupService;
-    this.disciplineService = disciplineService;
   }
 
   @Override
@@ -46,24 +40,15 @@ public class AddDisciplineCallback implements Callback {
     Long groupId = groupService.getGroupByChannelId(chatId)
                                .orElseThrow()
                                .getGroupId();
-    List<DisciplineDto> disciplines = groupService.getDisciplines(groupId);
-    DisciplineDto discipline = disciplineService.getDisciplineById(disciplineId)
-                                                .orElseThrow();
-    if (disciplines.contains(discipline)) {
-      return SendMessage.builder()
-                        .chatId(chatId)
-                        .text("Эта дисциплина уже есть в группе")
-                        .build();
-    }
-    groupService.addDiscipline(groupId, discipline);
+    groupService.removeDiscipline(groupId, disciplineId);
     return SendMessage.builder()
                       .chatId(chatId)
-                      .text("Дисциплина добавлена")
+                      .text("Дисциплина удалена")
                       .build();
   }
 
   @Override
   public ChatContext.State getAccordingContext() {
-    return ChatContext.State.ADD_DISCIPLINE;
+    return ChatContext.State.DELETE_DISCIPLINE;
   }
 }

@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 public class DisciplineService {
   private final RestClient client = RestClient.builder()
-                                              .baseUrl("https://localhost:8080/api/disciplines")
+                                              .baseUrl("http://localhost:8080/api/disciplines/")
                                               .requestInterceptor(((request, body, execution) -> {
                                                 log.info("Request sent on {}", request.getURI());
                                                 return execution.execute(request, body);

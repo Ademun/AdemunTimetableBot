@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 public class ProfessorService {
   private final RestClient client = RestClient.builder()
-                                              .baseUrl("https://localhost:8080/api/professors")
+                                              .baseUrl("http://localhost:8080/api/professors/")
                                               .requestInterceptor(((request, body, execution) -> {
                                                 log.info("Request sent on {}", request.getURI());
                                                 return execution.execute(request, body);

@@ -12,6 +12,6 @@ public class ChatContext {
 
 
   public enum State {
-    IDLE, CHAT_SETUP, GROUP_ADD_DISCIPLINE
+    IDLE, CHAT_SETUP, MANAGE_DISCIPLINES, ADD_DISCIPLINE, DELETE_DISCIPLINE
   }
 }

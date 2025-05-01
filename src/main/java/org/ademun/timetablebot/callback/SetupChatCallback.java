@@ -28,16 +28,13 @@ public class SetupChatCallback implements Callback {
   @Override
   public @NonNull SendMessage execute(Update update) {
     Long chatId = update.getMessage().getChatId();
-    ChatContext context = chatContextService.getChatContext(chatId).orElseThrow();
     String groupName = update.getMessage().getText();
     if (!validateGroupName(groupName)) {
       return SendMessage.builder().chatId(chatId)
           .text("Введите код группы в корректном формате (Например ИН-24-8)").build();
     }
-    context.setChatState(State.IDLE);
     GroupDto groupDto = new GroupDto(groupName, chatId);
-    GroupDto response = groupService.createGroup(groupDto);
-    System.out.println(response);
+    groupService.createGroup(groupDto);
     return SendMessage.builder().chatId(chatId).text("Группа " + groupName + " создана!").build();
   }
 

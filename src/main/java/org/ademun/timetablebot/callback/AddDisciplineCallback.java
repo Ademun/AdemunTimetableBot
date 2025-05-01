@@ -41,8 +41,16 @@ public class AddDisciplineCallback implements Callback {
                             "Кажется вы ещё не создали группу в этом чате. Используйте команду " + "/start")
                         .build();
     }
-    Long disciplineId = Long.valueOf(update.getCallbackQuery()
-                                           .getData());
+    String callbackData = update.getCallbackQuery()
+                                .getData();
+    if (callbackData.equals(ManageDisciplinesCallback.CallbackData.CREATE_DISCIPLINE.name())) {
+      context.setChatState(ChatContext.State.CREATE_DISCIPLINE);
+      return SendMessage.builder()
+                        .chatId(chatId)
+                        .text("Введите название дисциплины")
+                        .build();
+    }
+    Long disciplineId = Long.valueOf(callbackData);
     Long groupId = groupService.getGroupByChannelId(chatId)
                                .orElseThrow()
                                .getGroupId();
@@ -56,6 +64,7 @@ public class AddDisciplineCallback implements Callback {
                         .build();
     }
     groupService.addDiscipline(groupId, discipline);
+    context.setChatState(ChatContext.State.IDLE);
     return SendMessage.builder()
                       .chatId(chatId)
                       .text("Дисциплина добавлена")

@@ -41,6 +41,7 @@ public class RemoveDisciplineCallback implements Callback {
                                .orElseThrow()
                                .getGroupId();
     groupService.removeDiscipline(groupId, disciplineId);
+    context.setChatState(ChatContext.State.IDLE);
     return SendMessage.builder()
                       .chatId(chatId)
                       .text("Дисциплина удалена")

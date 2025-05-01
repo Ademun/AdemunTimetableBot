@@ -37,7 +37,7 @@ public class GroupInfoCommand implements Command {
     }
     context.setChatState(ChatContext.State.IDLE);
 
-    GroupDto groupDto = groupService.getGroupByChannelId(chatId);
+    GroupDto groupDto = groupService.getGroupByChannelId(chatId).orElseThrow();
     List<DisciplineDto> disciplines = groupService.getDisciplines(groupDto.getGroupId());
     List<ProfessorDto> professors = groupService.getProfessors(groupDto.getGroupId());
 

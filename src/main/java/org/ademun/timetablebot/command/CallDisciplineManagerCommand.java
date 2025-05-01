@@ -33,7 +33,7 @@ public class CallDisciplineManagerCommand implements Command {
       return SendMessage.builder()
                         .chatId(chatId)
                         .text(
-                            "Кажется вы ещё не создали группу в этом чате. Используйте команду " + "/start")
+                            "Кажется вы ещё не создали группу в этом чате. Используйте команду /start")
                         .build();
     }
     context.setChatState(ChatContext.State.MANAGE_DISCIPLINES);

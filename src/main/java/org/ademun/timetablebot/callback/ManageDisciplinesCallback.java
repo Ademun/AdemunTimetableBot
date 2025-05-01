@@ -45,7 +45,7 @@ public class ManageDisciplinesCallback implements Callback {
       return SendMessage.builder()
                         .chatId(chatId)
                         .text(
-                            "Кажется вы ещё не создали группу в этом чате. Используйте команду " + "/start")
+                            "Кажется вы ещё не создали группу в этом чате. Используйте команду /start")
                         .build();
     }
     Long groupId = groupService.getGroupByChannelId(chatId)

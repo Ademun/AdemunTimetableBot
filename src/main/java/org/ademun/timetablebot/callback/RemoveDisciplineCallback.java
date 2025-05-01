@@ -32,7 +32,7 @@ public class RemoveDisciplineCallback implements Callback {
       return SendMessage.builder()
                         .chatId(chatId)
                         .text(
-                            "Кажется вы ещё не создали группу в этом чате. Используйте команду " + "/start")
+                            "Кажется вы ещё не создали группу в этом чате. Используйте команду /start")
                         .build();
     }
     Long disciplineId = Long.valueOf(update.getCallbackQuery()

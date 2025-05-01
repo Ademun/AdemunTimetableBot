@@ -12,6 +12,7 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -55,22 +56,37 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
 
   @Override
   public void consume(Update update) {
-    System.out.println(update.getMessage().getText());
     if (update.hasMessage() && update.getMessage().hasText()) {
-      if (update.getMessage().getText().startsWith("/")) {
-        try {
-          telegramClient.execute(commandService.handle(update));
-        } catch (TelegramApiException e) {
-          throw new RuntimeException(e);
-        }
+      if (update.getMessage().hasText() && update.getMessage().getText().startsWith("/")) {
+        handleCommand(update);
       } else if (chatContextService.getChatContext(update.getMessage().getChatId()).orElseThrow()
           .getChatState() != ChatContext.State.IDLE) {
-        try {
-          telegramClient.execute(callbackService.handle(update));
-        } catch (TelegramApiException e) {
-          throw new RuntimeException(e);
-        }
+        handleCallback(update);
       }
+    } else if (update.hasCallbackQuery()) {
+      AnswerCallbackQuery answer = new AnswerCallbackQuery(update.getCallbackQuery().getId());
+      handleCallback(update);
+      try {
+        telegramClient.execute(answer);
+      } catch (TelegramApiException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private void handleCommand(Update update) {
+    try {
+      telegramClient.execute(commandService.handle(update));
+    } catch (TelegramApiException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void handleCallback(Update update) {
+    try {
+      telegramClient.execute(callbackService.handle(update));
+    } catch (TelegramApiException e) {
+      throw new RuntimeException(e);
     }
   }
 

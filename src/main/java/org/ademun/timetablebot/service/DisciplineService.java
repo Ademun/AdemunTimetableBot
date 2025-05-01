@@ -1,86 +1,61 @@
 package org.ademun.timetablebot.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.ademun.timetablebot.dto.DisciplineDto;
-import org.ademun.timetablebot.dto.GroupDto;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
 
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.util.List;
+import java.util.Optional;
 
-import static org.ademun.timetablebot.helpers.HttpHelper.executeRequest;
-
+@Slf4j
 @Service
 public class DisciplineService {
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final RestClient client = RestClient.builder()
+                                              .baseUrl("https://localhost:8080/api/disciplines")
+                                              .requestInterceptor(((request, body, execution) -> {
+                                                log.info("Request sent on {}", request.getURI());
+                                                return execution.execute(request, body);
+                                              }))
+                                              .build();
 
   public List<DisciplineDto> getAllDisciplines() {
-    HttpRequest request =
-        HttpRequest.newBuilder(URI.create("http://localhost:8080/api/disciplines/")).GET().build();
-    List<DisciplineDto> disciplineDtoList;
     try {
-      disciplineDtoList = mapper.readValue(executeRequest(request), new TypeReference<>() {
-      });
-    } catch (JsonProcessingException e) {
+      return client.get()
+                   .retrieve()
+                   .body(new ParameterizedTypeReference<>() {
+                   });
+    } catch (HttpClientErrorException e) {
       throw new RuntimeException(e);
     }
-    return disciplineDtoList;
   }
 
-  public DisciplineDto getDisciplineById(Long id) {
-    HttpRequest request =
-        HttpRequest.newBuilder(URI.create("http://localhost:8080/api/disciplines/" + id)).GET()
-            .build();
-    DisciplineDto disciplineDto;
+  public Optional<DisciplineDto> getDisciplineById(Long id) {
     try {
-      disciplineDto = mapper.readValue(executeRequest(request), new TypeReference<>() {
-      });
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      return Optional.ofNullable(client.get()
+                                       .uri("{id}", id)
+                                       .retrieve()
+                                       .body(DisciplineDto.class));
+    } catch (HttpClientErrorException e) {
+      log.error(e.getResponseBodyAsString());
     }
-    return disciplineDto;
+    return Optional.empty();
   }
 
   public DisciplineDto createDiscipline(DisciplineDto disciplineDto) {
-    String disciplineJson;
-    try {
-      disciplineJson = mapper.writeValueAsString(disciplineDto);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    HttpRequest request =
-        HttpRequest.newBuilder(URI.create("http://localhost:8080/api/disciplines/"))
-            .POST(HttpRequest.BodyPublishers.ofString(disciplineJson)).header("Content-Type", "application/json").build();
-    DisciplineDto disciplineDtoResponse;
-    try {
-      disciplineDtoResponse = mapper.readValue(executeRequest(request), new TypeReference<>() {
-      });
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    return disciplineDtoResponse;
+    return client.post()
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .body(disciplineDto)
+                 .retrieve()
+                 .toEntity(DisciplineDto.class)
+                 .getBody();
   }
 
   public void deleteDisciplineById(Long id) {
-    HttpRequest request =
-        HttpRequest.newBuilder(URI.create("http://localhost:8080/api/disciplines/" + id)).DELETE()
-            .build();
-    executeRequest(request);
-  }
-
-  public List<GroupDto> getGroups(Long id) {
-    HttpRequest request = HttpRequest.newBuilder(
-        URI.create("http://localhost:8080/api/disciplines/" + id + "/groups/")).GET().build();
-    List<GroupDto> groupDtoList;
-    try {
-      groupDtoList = mapper.readValue(executeRequest(request), new TypeReference<>() {
-      });
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    return groupDtoList;
+    client.delete()
+          .uri("{id}", id);
   }
 }

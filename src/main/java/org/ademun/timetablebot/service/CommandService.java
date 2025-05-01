@@ -22,10 +22,13 @@ public class CommandService {
   }
 
   public SendMessage handle(Update update) {
-    String commandName = update.getMessage().getText();
-    Command command =
-        commands.stream().filter(cmnd -> cmnd.getName().equals(commandName)).findFirst()
-            .orElse(null);
+    String commandName = update.getMessage()
+                               .getText();
+    Command command = commands.stream()
+                              .filter(cmnd -> cmnd.getName()
+                                                  .equals(commandName))
+                              .findFirst()
+                              .orElse(null);
     if (command == null) {
       return null;
     }

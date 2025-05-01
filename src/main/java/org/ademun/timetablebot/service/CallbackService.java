@@ -21,11 +21,19 @@ public class CallbackService {
   }
 
   public SendMessage handle(Update update) {
-    ChatContext.State state =
-        chatContextService.getChatContext(update.getMessage().getChatId()).orElseThrow().getChatState();
-    Callback callback =
-        callbacks.stream().filter(clbck -> clbck.getAccordingContext() == state).findFirst()
-            .orElse(null);
+    Long chatId = update.hasMessage() ?
+        update.getMessage()
+              .getChatId() :
+        update.getCallbackQuery()
+              .getMessage()
+              .getChatId();
+    ChatContext.State state = chatContextService.getChatContext(chatId)
+                                                .orElseThrow()
+                                                .getChatState();
+    Callback callback = callbacks.stream()
+                                 .filter(clbck -> clbck.getAccordingContext() == state)
+                                 .findFirst()
+                                 .orElse(null);
     System.out.println(callback);
     if (callback == null) {
       return null;

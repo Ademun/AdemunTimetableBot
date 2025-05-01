@@ -2,6 +2,7 @@ package org.ademun.timetablebot.callback;
 
 import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
+import org.ademun.timetablebot.context.ChatContext.State;
 import org.ademun.timetablebot.dto.GroupDto;
 import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.GroupService;
@@ -14,12 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class SetupChatFirstStepCallback implements Callback {
+public class SetupChatCallback implements Callback {
   private final ChatContextService chatContextService;
   private final GroupService groupService;
 
   @Autowired
-  public SetupChatFirstStepCallback(ChatContextService chatContextService, GroupService groupService) {
+  public SetupChatCallback(ChatContextService chatContextService, GroupService groupService) {
     this.chatContextService = chatContextService;
     this.groupService = groupService;
   }
@@ -33,7 +34,7 @@ public class SetupChatFirstStepCallback implements Callback {
       return SendMessage.builder().chatId(chatId)
           .text("Введите код группы в корректном формате (Например ИН-24-8)").build();
     }
-    context.setChatState(ChatContext.State.IDLE);
+    context.setChatState(State.IDLE);
     GroupDto groupDto = new GroupDto(groupName, chatId);
     GroupDto response = groupService.createGroup(groupDto);
     System.out.println(response);
@@ -47,7 +48,7 @@ public class SetupChatFirstStepCallback implements Callback {
   }
 
   @Override
-  public ChatContext.State getAccordingContext() {
-    return ChatContext.State.CHAT_SETUP;
+  public State getAccordingContext() {
+    return State.CHAT_SETUP;
   }
 }

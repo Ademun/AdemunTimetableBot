@@ -43,9 +43,11 @@ public class AddDisciplineCallback implements Callback {
                         .text("Введите название дисциплины")
                         .build();
     }
-    DisciplineDto disciplineDto = disciplineService.getDisciplineById(Long.parseLong(callbackData));
+    DisciplineDto disciplineDto = disciplineService.getDisciplineById(Long.parseLong(callbackData))
+                                                   .orElseThrow();
     groupService.addDiscipline(groupService.getGroupByChannelId(chatId)
-                                           .getGroup_id(), disciplineDto);
+                                           .orElseThrow()
+                                           .getGroupId(), disciplineDto);
     return SendMessage.builder()
                       .chatId(chatId)
                       .text("Дисциплина успешно добавлена")

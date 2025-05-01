@@ -3,10 +3,8 @@ package org.ademun.timetablebot.command;
 import lombok.NonNull;
 import org.ademun.timetablebot.context.ChatContext;
 import org.ademun.timetablebot.dto.DisciplineDto;
-import org.ademun.timetablebot.dto.GroupDto;
 import org.ademun.timetablebot.service.ChatContextService;
 import org.ademun.timetablebot.service.DisciplineService;
-import org.ademun.timetablebot.service.GroupService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,7 +56,7 @@ public class AddDisciplineCommand implements Command {
     for (DisciplineDto discipline : disciplines) {
       InlineKeyboardRow row = new InlineKeyboardRow(
           InlineKeyboardButton.builder().text(discipline.getName())
-              .callbackData(String.valueOf(discipline.getDiscipline_id())).build());
+                              .callbackData(String.valueOf(discipline.getDisciplineId())).build());
       rows.add(row);
     }
     return new InlineKeyboardMarkup(rows);

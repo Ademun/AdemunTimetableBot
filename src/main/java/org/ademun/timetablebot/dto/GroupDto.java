@@ -12,18 +12,18 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GroupDto {
-  private Long group_id;
+  private Long groupId;
   private String name;
-  private Long channel_id;
+  private Long channelId;
 
-  public GroupDto(Long group_id, String name, Long channel_id) {
-    this.group_id = group_id;
+  public GroupDto(Long groupId, String name, Long channelId) {
+    this.groupId = groupId;
     this.name = name;
-    this.channel_id = channel_id;
+    this.channelId = channelId;
   }
 
-  public GroupDto(String name, Long channel_id) {
+  public GroupDto(String name, Long channelId) {
     this.name = name;
-    this.channel_id = channel_id;
+    this.channelId = channelId;
   }
 }

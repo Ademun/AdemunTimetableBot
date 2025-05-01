@@ -38,8 +38,8 @@ public class GroupInfoCommand implements Command {
     context.setChatState(ChatContext.State.IDLE);
 
     GroupDto groupDto = groupService.getGroupByChannelId(chatId);
-    List<DisciplineDto> disciplines = groupService.getDisciplines(groupDto.getGroup_id());
-    List<ProfessorDto> professors = groupService.getProfessors(groupDto.getGroup_id());
+    List<DisciplineDto> disciplines = groupService.getDisciplines(groupDto.getGroupId());
+    List<ProfessorDto> professors = groupService.getProfessors(groupDto.getGroupId());
 
     StringBuilder text = new StringBuilder().append(groupDto.getName()).append("\n")
         .append(String.format("Предметы (%d):\n", disciplines.size()));

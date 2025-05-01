@@ -12,12 +12,12 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DisciplineDto {
-  private Long discipline_id;
+  private Long disciplineId;
   private String name;
   private String url;
 
-  public DisciplineDto(Long discipline_id, String name, String url) {
-    this.discipline_id = discipline_id;
+  public DisciplineDto(Long disciplineId, String name, String url) {
+    this.disciplineId = disciplineId;
     this.name = name;
     this.url = url;
   }

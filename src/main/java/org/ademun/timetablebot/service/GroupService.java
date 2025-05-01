@@ -50,7 +50,7 @@ public class GroupService {
   public Optional<GroupDto> getGroupByChannelId(Long channelId) {
     List<GroupDto> groups = getAllGroups();
     return groups.stream()
-                 .filter(groupDto -> groupDto.getChannel_id()
+                 .filter(groupDto -> groupDto.getChannelId()
                                              .equals(channelId))
                  .findFirst();
   }

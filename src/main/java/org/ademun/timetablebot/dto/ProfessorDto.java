@@ -12,15 +12,15 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProfessorDto {
-  private Long professor_id;
+  private Long professorId;
   private String firstName;
   private String lastName;
   private String patronymic;
   private String url;
 
-  public ProfessorDto(Long professor_id, String firstName, String lastName, String patronymic,
+  public ProfessorDto(Long professorId, String firstName, String lastName, String patronymic,
       String url) {
-    this.professor_id = professor_id;
+    this.professorId = professorId;
     this.firstName = firstName;
     this.lastName = lastName;
     this.patronymic = patronymic;

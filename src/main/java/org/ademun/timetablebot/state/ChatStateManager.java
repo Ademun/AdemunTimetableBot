@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChatStateManager {
 
-  private final Map<Long, ChatState> states = new ConcurrentHashMap<Long, ChatState>();
+  private final Map<Long, ChatState> states = new ConcurrentHashMap<>();
 
   public ChatState getChatState(long chatId) {
     return states.getOrDefault(chatId, ChatState.DEFAULT);

@@ -1,13 +1,15 @@
-package org.ademun.timetablebot.callback;
+package org.ademun.timetablebot.handler.command;
 
 import lombok.NonNull;
-import org.ademun.timetablebot.context.ChatContext;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public interface Callback {
+public interface Command {
+
   @NonNull
   SendMessage execute(Update update);
 
-  ChatContext.State getAccordingContext();
+  String getName();
+
+  String getDescription();
 }

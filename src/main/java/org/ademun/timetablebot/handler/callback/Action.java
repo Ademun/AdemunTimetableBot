@@ -1,0 +1,5 @@
+package org.ademun.timetablebot.handler.callback;
+
+public enum Action {
+  MANAGER_ADD_DISCIPLINE, MANAGER_REMOVE_DISCIPLINE, ADD_NEW_DISCIPLINE, ADD_EXISTING_DISCIPLINE, REMOVE_DISCIPLINE;
+}

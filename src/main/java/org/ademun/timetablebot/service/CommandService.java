@@ -1,19 +1,19 @@
 package org.ademun.timetablebot.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import lombok.Getter;
-import org.ademun.timetablebot.command.Command;
+import org.ademun.timetablebot.handler.command.Command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 @Service
 @Getter
 public class CommandService {
+
   private final List<Command> commands;
 
   @Autowired
@@ -23,12 +23,12 @@ public class CommandService {
 
   public SendMessage handle(Update update) {
     String commandName = update.getMessage()
-                               .getText();
+        .getText();
     Command command = commands.stream()
-                              .filter(cmnd -> cmnd.getName()
-                                                  .equals(commandName))
-                              .findFirst()
-                              .orElse(null);
+        .filter(cmnd -> cmnd.getName()
+            .equals(commandName))
+        .findFirst()
+        .orElse(null);
     if (command == null) {
       return null;
     }

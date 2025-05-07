@@ -95,7 +95,8 @@ public class GroupService {
 
   @Retryable
   public void addProfessor(Long groupId, Professor professor) {
-    client.post().uri("{groupId}/professors/", groupId).body(professor);
+    client.post().uri("{groupId}/professors/", groupId).body(professor).retrieve()
+        .toBodilessEntity();
   }
 
   @Retryable

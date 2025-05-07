@@ -20,16 +20,13 @@ public class ProfessorService {
       .requestInterceptor(((request, body, execution) -> {
         log.info("Request sent on {}", request.getURI());
         return execution.execute(request, body);
-      }))
-      .build();
+      })).build();
 
   @Retryable
   public List<Professor> getAll() {
     try {
-      return client.get()
-          .retrieve()
-          .body(new ParameterizedTypeReference<>() {
-          });
+      return client.get().retrieve().body(new ParameterizedTypeReference<>() {
+      });
     } catch (HttpClientErrorException e) {
       throw new RuntimeException(e);
     }
@@ -38,10 +35,19 @@ public class ProfessorService {
   @Retryable
   public Optional<Professor> getById(Long id) {
     try {
-      return Optional.ofNullable(client.get()
-          .uri("{id}", id)
-          .retrieve()
-          .body(Professor.class));
+      return Optional.ofNullable(client.get().uri("{id}", id).retrieve().body(Professor.class));
+    } catch (HttpClientErrorException e) {
+      log.error(e.getResponseBodyAsString());
+    }
+    return Optional.empty();
+  }
+
+  @Retryable
+  public Optional<Professor> getByFullName(String name) {
+    try {
+      return Optional.ofNullable(
+          client.get().uri(uriBuilder -> uriBuilder.queryParam("name", name).build()).retrieve()
+              .body(Professor.class));
     } catch (HttpClientErrorException e) {
       log.error(e.getResponseBodyAsString());
     }
@@ -50,17 +56,12 @@ public class ProfessorService {
 
   @Retryable
   public Professor create(Professor professor) {
-    return client.post()
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(professor)
-        .retrieve()
-        .toEntity(Professor.class)
-        .getBody();
+    return client.post().contentType(MediaType.APPLICATION_JSON).body(professor).retrieve()
+        .toEntity(Professor.class).getBody();
   }
 
   @Retryable
   public void delete(Long id) {
-    client.delete()
-        .uri("{id}", id);
+    client.delete().uri("{id}", id);
   }
 }

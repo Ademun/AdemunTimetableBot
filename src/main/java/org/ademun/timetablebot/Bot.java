@@ -33,6 +33,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     this.telegramClient = new OkHttpTelegramClient(config.getToken());
     this.listeners = new ArrayList<>(listeners);
     this.commands = new ArrayList<>(commands);
+    setupCommands();
   }
 
   private void setupCommands() {

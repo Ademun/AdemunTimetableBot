@@ -24,4 +24,8 @@ public class Professor {
   public String getFullName() {
     return firstName + " " + lastName + " " + patronymic;
   }
+
+  public String getShortName() {
+    return String.format("%s %s.%s.", firstName, lastName.charAt(0), patronymic.charAt(0));
+  }
 }
